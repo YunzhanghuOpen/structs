@@ -220,8 +220,8 @@ func (s *Struct) Values() []interface{} {
 		}
 
 		if tagOpts.Has("string") {
-			if s, err := StringResolve(val); err == nil {
-				t = append(t, s.String())
+			if ss, err := s.StringResolve(val); err == nil {
+				t = append(t, ss)
 			}
 
 			continue
