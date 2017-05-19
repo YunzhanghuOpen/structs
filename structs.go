@@ -2,6 +2,7 @@
 package structs
 
 import (
+	"errors"
 	"fmt"
 
 	"reflect"
@@ -149,6 +150,31 @@ func (s *Struct) FillMap(out map[string]interface{}) {
 	}
 }
 
+func (s *Struct) StringResolve(v reflect.Value) (s string, err error) {
+	if v.Kind() == reflect.String {
+	  	s = v.String()
+	    return
+	}
+
+	switch v.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+	    s = strconv.FormatInt(v.Int(), 10)
+	    return
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+	    w.s = strconv.FormatUint(v.Uint(), 10)
+	    return
+	}
+
+	sb, ok := v.Interface().(fmt.Stringer)
+	if ok {
+		s = sb.String()
+		return
+	}
+
+	err = errors.New("Cannot format string")
+	return
+}
+
 // Values converts the given s struct's field values to a []interface{}.  A
 // struct tag with the content of "-" ignores the that particular field.
 // Example:
@@ -193,10 +219,10 @@ func (s *Struct) Values() []interface{} {
 		}
 
 		if tagOpts.Has("string") {
-			s, ok := val.Interface().(fmt.Stringer)
-			if ok {
+			if s, err := StringResolve(val); err == nil {
 				t = append(t, s.String())
 			}
+
 			continue
 		}
 
