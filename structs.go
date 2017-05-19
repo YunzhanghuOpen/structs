@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"reflect"
+	"strconv"
 )
 
 var (
@@ -150,24 +151,24 @@ func (s *Struct) FillMap(out map[string]interface{}) {
 	}
 }
 
-func (s *Struct) StringResolve(v reflect.Value) (s string, err error) {
+func (s *Struct) StringResolve(v reflect.Value) (ss string, err error) {
 	if v.Kind() == reflect.String {
-	  	s = v.String()
+	  	ss = v.String()
 	    return
 	}
 
 	switch v.Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-	    s = strconv.FormatInt(v.Int(), 10)
+	    ss = strconv.FormatInt(v.Int(), 10)
 	    return
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-	    w.s = strconv.FormatUint(v.Uint(), 10)
+	    ss = strconv.FormatUint(v.Uint(), 10)
 	    return
 	}
 
 	sb, ok := v.Interface().(fmt.Stringer)
 	if ok {
-		s = sb.String()
+		ss = sb.String()
 		return
 	}
 
